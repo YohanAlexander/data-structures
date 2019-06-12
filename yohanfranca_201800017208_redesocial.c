@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
-#define MAX 61
+#define MAX 101
 
 uint32_t linhas = 0, i;
 char linha[MAX], *pessoa, **entrada;
