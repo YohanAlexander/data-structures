@@ -4,7 +4,7 @@
 #include<string.h>
 #define MAX 101
 
-uint32_t linhas = 0, i;
+uint32_t linhas = 0, i = 0;
 char linha[MAX], *pessoa, **entrada;
 
 typedef struct elemento{
@@ -141,9 +141,9 @@ uint32_t terminal(lista* lista){
         elemento* atual = lista->head;
         for(uint32_t j = 0; j < lista->tamanho; j++){
             printf("%s<-%s->%s\n", atual->prev->nome, atual->nome, atual->next->nome);
-            printf("%d\n", lista->tamanho);
-            atual = atual->next; 
+            atual = atual->next;
         }
+        printf("%d PESSOAS\n", lista->tamanho);
         return 0;
     }
 };
@@ -163,17 +163,6 @@ int main(int argc, char** argv){
             entrada[i] = (char*)strdup(linha);
             i++;
     }
-
-    /*char entrada[10][MAX] = {"ADD Jose da Silva",
-                "SHOW Jose da Silva",
-                "ADD Jose da Silva",
-                "ADD Joao dos Santos",
-                "ADD Maria da Penha",
-                "REMOVE Joao dos Santos",
-                "REMOVE Maria da Silva",
-                "ADD Alan Turing",
-                "SHOW Maria da Penha",
-                "SHOW Bruno Prado"};*/
     
     lista* string = iniciar();
     

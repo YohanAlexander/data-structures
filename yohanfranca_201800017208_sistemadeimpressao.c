@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
-#define MAX 61
+#define MAX 101
 
 typedef struct arquivo arquivo;
 typedef struct documento documento;
