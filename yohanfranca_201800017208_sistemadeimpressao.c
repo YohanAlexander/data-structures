@@ -167,15 +167,10 @@ int32_t ocupada(impressora* printer){
 
 void printimpressora(impressora* printer, FILE* OUTPUT){
     fprintf(OUTPUT, "[%s] ", (char*)printer->nome);
-    if(printer->stack->topo > 0){
-        for(int32_t j = printer->stack->topo; j > 0; j--){
-            fprintf(OUTPUT, "%s-%dp, ", (char*)printer->stack->doc[j].nome, printer->stack->doc[j].paginas);
-        }
-            fprintf(OUTPUT, "%s-%dp\n", (char*)printer->stack->doc[0].nome, printer->stack->doc[0].paginas);        
-        }
-    if(printer->stack->topo == 0){
-        fprintf(OUTPUT, "%s-%dp\n", (char*)printer->stack->doc[0].nome, printer->stack->doc[0].paginas);
+    for(int32_t i = printer->stack->topo; i > 0; i--){
+        fprintf(OUTPUT, "%s-%dp, ", (char*)printer->stack->doc[i].nome, printer->stack->doc[i].paginas);
     }
+    fprintf(OUTPUT, "%s-%dp\n", (char*)printer->stack->doc[0].nome, printer->stack->doc[0].paginas);
 };
 
 void printpilha(pilha* stack, FILE* OUTPUT){
