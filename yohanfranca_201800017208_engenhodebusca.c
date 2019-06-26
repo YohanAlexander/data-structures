@@ -8,11 +8,11 @@ typedef struct busca busca;
 typedef struct servidor servidor;
 
 int32_t count = 0, size = 0, tokens = 0, pesquisas = 0, sum = 0, hsum = 0, dsum = 0;
-char string[MAX];
+char entrada[MAX];
 servidor* servers;
 
 struct busca{
-    char string[MAX];
+    char *string;
 };
 
 struct servidor{
@@ -20,21 +20,21 @@ struct servidor{
     busca* pesquisa;
 };
 
-servidor* iniciarservidores(int32_t count, int32_t size){
+servidor* iniciarservidores(int32_t servidores, int32_t capacidade){
 
     servidor* server;
 
-    server = malloc(count*sizeof(servidor));
+    server = malloc(servidores*sizeof(servidor));
 
     if(server == NULL){
         return NULL;
     }
 
     else{
-        for(int32_t i = 0; i < count; i++){
-            server[i].capacidade = size;
+        for(int32_t i = 0; i < servidores; i++){
+            server[i].capacidade = capacidade;
             server[i].tamanho = 0;
-            server[i].pesquisa = malloc(size*sizeof(busca));
+            server[i].pesquisa = malloc(capacidade*sizeof(busca*));
         }
     
         return server;
@@ -43,7 +43,7 @@ servidor* iniciarservidores(int32_t count, int32_t size){
 };
 
 void inserirbusca(servidor* server, char string[MAX]){
-    strcpy((char* restrict)&server->pesquisa[server->tamanho].string, (char * restrict)string);
+    server->pesquisa[server->tamanho].string = (char*)strdup(string);
     server->tamanho++;
 };
 
@@ -137,10 +137,10 @@ int main(int argc, char** argv){
     printf("Buscas %d\n", pesquisas);
 
     for(int32_t i = 0; i < pesquisas; i++){
-        fscanf(INPUT, "%d %[^\n]\n", &tokens, string);
-        printf("(%s)\n", string);
-        sum = hash(string, OUTPUT);
-        inserirbusca(&servers[sum], string);
+        fscanf(INPUT, "%d %[^\n]\n", &tokens, entrada);
+        printf("(%s) %d\n", entrada, checksum(entrada));
+        sum = hash(entrada, OUTPUT);
+        inserirbusca(&servers[sum], entrada);
         imprimir(&servers[sum], sum, OUTPUT);
     }
 
