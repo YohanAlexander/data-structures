@@ -4,26 +4,31 @@
 #include<string.h>
 #define MAX 101
 
-uint32_t linhas = 0, i = 0;
-char linha[MAX], *pessoa, **entrada;
+typedef struct elemento elemento;
+typedef struct lista lista;
 
-typedef struct elemento{
+char pessoa[MAX], token[MAX];
+
+struct elemento{
     char nome[MAX];
-    struct elemento *prev, *next;
-} elemento;
+    elemento *prev, *next;
+};
 
-typedef struct lista{
-    uint32_t tamanho;
-    struct elemento *head, *tail;
-} lista;
+struct lista{
+    int32_t tamanho;
+    elemento *head, *tail;
+};
 
 lista* iniciar(){
     
     lista* lista;
-    lista = malloc(sizeof(lista)); 
+
+    lista = malloc(sizeof(lista));
+
     if(lista == NULL){
         return NULL;
     }
+
     else{
         lista->head = NULL;
         lista->tail = NULL;
@@ -35,7 +40,7 @@ lista* iniciar(){
 elemento* buscar(lista* lista, char pessoa[MAX]){
    
    elemento* atual = lista->head;
-   uint32_t f = 0;
+   int32_t f = 0;
    
    while(f != lista->tamanho){
         if(strcmp(atual->nome, pessoa) == 0){f++; return atual;}
@@ -44,10 +49,10 @@ elemento* buscar(lista* lista, char pessoa[MAX]){
    return NULL;
 };
 
-uint32_t comparar(lista* lista, char pessoa[MAX]){
+int32_t comparar(lista* lista, char pessoa[MAX]){
    
    elemento* atual = lista->head;
-   uint32_t f = 0;
+   int32_t f = 0;
    
    while(f != lista->tamanho){
         if(strcmp(atual->nome, pessoa) == 0){f++; return 0;}
@@ -56,9 +61,10 @@ uint32_t comparar(lista* lista, char pessoa[MAX]){
    return -1;
 };
 
-uint32_t inserir(lista* lista, char pessoa[MAX]){
+int32_t inserir(lista* lista, char pessoa[MAX]){
     
     elemento* new;
+
     new = malloc(sizeof(elemento));
     
     if(new == NULL){
@@ -89,7 +95,7 @@ uint32_t inserir(lista* lista, char pessoa[MAX]){
     }
 };
 
-uint32_t remover(lista* lista, char pessoa[MAX]){
+int32_t remover(lista* lista, char pessoa[MAX]){
     
     elemento* new;
 
@@ -131,7 +137,7 @@ uint32_t remover(lista* lista, char pessoa[MAX]){
     }
 };
 
-uint32_t terminal(lista* lista){
+int32_t terminal(lista* lista){
     
     if(lista->tamanho == 0){
         printf("NULL\n");
@@ -139,7 +145,7 @@ uint32_t terminal(lista* lista){
     }
     else{
         elemento* atual = lista->head;
-        for(uint32_t j = 0; j < lista->tamanho; j++){
+        for(int32_t j = 0; j < lista->tamanho; j++){
             printf("%s<-%s->%s\n", atual->prev->nome, atual->nome, atual->next->nome);
             atual = atual->next;
         }
@@ -153,22 +159,11 @@ int main(int argc, char** argv){
     FILE* INPUT = fopen(argv[1], "r");
     FILE* OUTPUT = fopen(argv[2], "w");
     
-    while(fgets(linha, MAX, INPUT)){linhas++;}
-   
-    entrada = (char**)malloc(linhas*sizeof(char*));
-    rewind(INPUT);
-
-    while(fgets(linha, MAX, INPUT) != NULL && i <= linhas){
-            strtok(linha, "\n");
-            entrada[i] = (char*)strdup(linha);
-            i++;
-    }
-    
     lista* string = iniciar();
     
-    for(uint32_t j = 0; j < linhas; j++){
-        if(strstr(entrada[j], "ADD")){
-            pessoa = entrada[j] + 4;
+    while(fscanf(INPUT, "%s %[^\n]\n", token, pessoa) != EOF){
+
+        if(strcmp(token, "ADD") == 0){
             if(inserir(string, pessoa) == 0){
                 fprintf(OUTPUT, "[ OK  ] ADD %s\n", pessoa);
             }
@@ -176,8 +171,8 @@ int main(int argc, char** argv){
                 fprintf(OUTPUT, "[ERROR] ADD %s\n", pessoa);
             }
         }
-        if(strstr(entrada[j], "REMOVE")){
-            pessoa = entrada[j] + 7;
+
+        if(strcmp(token, "REMOVE") == 0){
             if(remover(string, pessoa) == 0){
                 fprintf(OUTPUT, "[ OK  ] REMOVE %s\n", pessoa);
             }
@@ -185,8 +180,8 @@ int main(int argc, char** argv){
                 fprintf(OUTPUT, "[ERROR] REMOVE %s\n", pessoa);
             }
         }
-        if(strstr(entrada[j], "SHOW")){
-            pessoa = entrada[j] + 5;
+
+        if(strcmp(token, "SHOW") == 0){
             if(comparar(string, pessoa) == 0){
                 elemento* atual = buscar(string, pessoa);
                 fprintf(OUTPUT, "[ OK  ] %s<-%s->%s\n", atual->prev->nome, atual->nome, atual->next->nome);
