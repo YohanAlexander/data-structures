@@ -2,22 +2,23 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
-#define MAX 61
+#define MAX 101
 
 typedef struct fila fila;
 typedef struct pilha pilha;
 typedef struct documento documento;
 typedef struct impressora impressora;
 
-int32_t soma = 0, vazia = 0, printers = 0, files = 0, paginas = 0, menor = 0;
+int32_t soma = 0, menor = 0, printers = 0, files = 0, paginas = 0;
 char printername[MAX], filename[MAX];
+
 impressora* impressoras;
 fila* documentos;
 pilha* entrega;
 
 struct documento{
     char nome[MAX];
-    int32_t paginas, print;
+    int32_t paginas;
 };
 
 struct fila{
@@ -31,6 +32,7 @@ struct pilha{
 };
 
 struct impressora{
+    int32_t printing;
     char nome[MAX];
     pilha* stack;
 };
@@ -79,7 +81,6 @@ void enfileirar(fila* fila, documento* doc){
 
     strcpy(fila->doc[((fila->head + fila->tail) % fila->capacidade)].nome, doc->nome);
     fila->doc[((fila->head + fila->tail) % fila->capacidade)].paginas = doc->paginas;
-    fila->doc[((fila->head + fila->tail) % fila->capacidade)].print = doc->print;
     fila->tail = ((fila->tail + 1) % fila->capacidade);
     fila->tamanho++;
 
@@ -99,7 +100,6 @@ void empilhar(pilha* pilha, documento* doc){
     pilha->topo++;
     strcpy(pilha->doc[pilha->topo].nome, doc->nome);
     pilha->doc[pilha->topo].paginas = doc->paginas;
-    pilha->doc[pilha->topo].print = doc->print;
 
 };
 
@@ -109,18 +109,6 @@ void desempilhar(pilha* pilha){
     pilha->doc[pilha->topo].paginas = 0;
     pilha->topo--;
     pilha->capacidade--;
-
-};
-
-int32_t ocupada(impressora* printer){
-
-    if(printer->stack->doc[printer->stack->topo].print > 0){
-        return 1;
-    }
-
-    else{
-        return 0;
-    }
 
 };
 
@@ -145,24 +133,12 @@ void printpilha(pilha* stack, FILE* OUTPUT){
 
 };
 
-void imprimir(impressora* printer, int32_t menor, pilha* stack, FILE* OUTPUT){
+void imprimir(impressora* printer, fila* docs, FILE* OUTPUT){
 
-    documento impresso;
-    
-    for(int32_t i = 0; i < printers; i++){
-        
-        if(printer[i].stack->doc[printer[i].stack->topo].print - menor == 0){
-            printer[i].stack->doc[printer[i].stack->topo].print -= menor;
-            impresso = printer[i].stack->doc[printer[i].stack->topo];
-            empilhar(stack, &impresso);
-            printimpressora(&printer[i], OUTPUT);
-        }
-
-        else{
-            printer[i].stack->doc[printer[i].stack->topo].print -= menor;
-        }
-
-    }
+    printer->printing = docs->doc[docs->head].paginas;
+    empilhar(printer->stack, &docs->doc[docs->head]);
+    desenfilerirar(docs);
+    printimpressora(printer, OUTPUT);
 
 };
 
@@ -196,7 +172,7 @@ int main(int argc, char** argv){
         printf("%s-%dp\n", filename, paginas);
         documento doc;
         strcpy(doc.nome, filename);
-        doc.paginas = doc.print = paginas;
+        doc.paginas = paginas;
         enfileirar(documentos, &doc);
         soma += paginas;
     }
@@ -205,24 +181,36 @@ int main(int argc, char** argv){
     
     entrega = iniciarpilha(documentos->capacidade);
     
-    while(documentos->tamanho >= 0){
-        
+    while(entrega->topo + 1 != entrega->capacidade){
+
+        menor = soma;
+
         for(int32_t i = 0; i < printers; i++){
-            
-            menor = impressoras[0].stack->doc[impressoras[0].stack->topo].print;
-            if(impressoras[i].stack->doc[impressoras[i].stack->topo].print < menor){
-                menor = impressoras[i].stack->doc[impressoras[i].stack->topo].print;
+
+            if(documentos->tamanho == documentos->capacidade){
+                for(int32_t i = 0; i < printers; i++){
+                    imprimir(&impressoras[i], documentos, OUTPUT);
+                }
             }
-            
-            vazia = ocupada(&impressoras[i]);
-            if(vazia == 0){
-                empilhar(impressoras[i].stack, &documentos->doc[documentos->head]);
-                desenfilerirar(documentos);
+
+            if(impressoras[i].printing < menor && impressoras[i].printing > 0){
+                menor = impressoras[i].printing;
+            }
+
+            if(impressoras[i].printing > 0){
+                impressoras[i].printing -= menor;
+                
+                if(impressoras[i].printing == 0){
+                    empilhar(entrega, &impressoras[i].stack->doc[impressoras[i].stack->topo]);
+                    
+                    if(documentos->tamanho > 0){
+                        imprimir(&impressoras[i], documentos, OUTPUT);
+                    }
+                }
             }
         }
-        imprimir(impressoras, menor, entrega, OUTPUT);
     }
-    
+
     fprintf(OUTPUT, "%dp\n", soma);
     printpilha(entrega, OUTPUT);
 

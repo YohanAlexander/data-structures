@@ -7,12 +7,14 @@
 typedef struct busca busca;
 typedef struct servidor servidor;
 
+char string[MAX];
+
 int32_t count = 0, size = 0, tokens = 0, pesquisas = 0, sum = 0, hsum = 0, dsum = 0;
-char entrada[MAX];
+
 servidor* servers;
 
 struct busca{
-    char *string;
+    char string[MAX];
 };
 
 struct servidor{
@@ -24,27 +26,22 @@ servidor* iniciarservidores(int32_t servidores, int32_t capacidade){
 
     servidor* server;
 
-    server = malloc(servidores*sizeof(servidor));
+    server = malloc(2*servidores*sizeof(servidor));
 
-    if(server == NULL){
-        return NULL;
-    }
-
-    else{
-        for(int32_t i = 0; i < servidores; i++){
-            server[i].capacidade = capacidade;
-            server[i].tamanho = 0;
-            server[i].pesquisa = malloc(capacidade*sizeof(busca*));
-        }
-    
-        return server;
+    for(int32_t i = 0; i < servidores; i++){
+        server[i].capacidade = capacidade;
+        server[i].tamanho = 0;
+        server[i].pesquisa = malloc(2*capacidade*sizeof(busca));
     }
     
+    return server;
 };
 
 void inserirbusca(servidor* server, char string[MAX]){
-    server->pesquisa[server->tamanho].string = (char*)strdup(string);
+    
+    strcpy(server->pesquisa[server->tamanho].string, string);
     server->tamanho++;
+
 };
 
 int32_t ocupado(servidor* server){
@@ -116,11 +113,14 @@ void imprimir(servidor* server,int32_t indice, FILE* OUTPUT){
     }
 
     else{
+
         for(int32_t i = 0; i < server->tamanho - 1; i++){
             fprintf(OUTPUT, "%s, ", server->pesquisa[i].string);
         }
+
         fprintf(OUTPUT, "%s\n", server->pesquisa[server->tamanho - 1].string);
     }
+
 };
 
 int main(int argc, char** argv){
@@ -137,10 +137,10 @@ int main(int argc, char** argv){
     printf("Buscas %d\n", pesquisas);
 
     for(int32_t i = 0; i < pesquisas; i++){
-        fscanf(INPUT, "%d %[^\n]\n", &tokens, entrada);
-        printf("(%s) %d\n", entrada, checksum(entrada));
-        sum = hash(entrada, OUTPUT);
-        inserirbusca(&servers[sum], entrada);
+        fscanf(INPUT, "%d %[^\n]\n", &tokens, string);
+        printf("(%s) %d\n", string, checksum(string));
+        sum = hash(string, OUTPUT);
+        inserirbusca(&servers[sum], string);
         imprimir(&servers[sum], sum, OUTPUT);
     }
 
