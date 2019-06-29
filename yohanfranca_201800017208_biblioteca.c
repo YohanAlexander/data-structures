@@ -6,35 +6,22 @@
 
 typedef struct arquivo arquivo;
 typedef struct livro livro;
-long consulta;
-int32_t retorno = 0, bin = 0, inter = 0, binwin = 0, interwin = 0, binall = 0, interall = 0;
-livro* livros;
+
+int32_t result = 0, bin = 0, inter = 0, binwin = 0, interwin = 0, binall = 0, interall = 0;
 
 struct arquivo{
+
     int32_t livros, consultas;
     long ISBN;
     char autor[MAX], titulo[MAX];
+
 };
 
 struct livro{
+
     long ISBN;
     char autor[MAX], titulo[MAX];
-};
-
-livro* iniciarlivros(int32_t size){
-
-    livro* livros;
-
-    livros = malloc(size*sizeof(livro));
-
-    if(livros == NULL){
-        return NULL;
-    }
-    else{
-        for(int32_t i = 0; i < size; i++){
-        }
-        return livros;
-    }
+    
 };
 
 int32_t buscabin(livro* book, int32_t inicio, int32_t final, long ISBN){
@@ -58,6 +45,7 @@ int32_t buscabin(livro* book, int32_t inicio, int32_t final, long ISBN){
     else{
         return buscabin(book, inicio, index - 1, ISBN);
     }
+
 };
 
 int32_t buscainter(livro* book, int32_t inicio, int32_t final, long ISBN){
@@ -81,6 +69,7 @@ int32_t buscainter(livro* book, int32_t inicio, int32_t final, long ISBN){
     else{
         return buscainter(book, inicio, index - 1, ISBN);
     }
+
 };
 
 void imprimir(livro* book, int32_t index, int32_t bin, int32_t inter, long ISBN, FILE* OUTPUT){
@@ -100,45 +89,56 @@ int main(int argc, char** argv){
     FILE* INPUT = fopen(argv[1], "r");
     FILE* OUTPUT = fopen(argv[2], "w");
 
+    long consulta;
+
     arquivo file;
 
     fscanf(INPUT, "%d\n", &file.livros);
-    printf("%d\n", file.livros);
+    printf("%d LIVROS\n", file.livros);
 
-    livros = malloc(file.livros*sizeof(livro));
+    livro* livros = malloc(file.livros*sizeof(livro));
 
     for(int32_t i = 0; i < file.livros; i++){
+
         fscanf(INPUT, "%ld %[^&]&%[^\n]\n", &file.ISBN, file.autor, file.titulo);
+        
         livro book;
+        
         book.ISBN = file.ISBN;
         strcpy(book.autor, file.autor);
         strcpy(book.titulo, file.titulo);
-        printf("(%ld) ", book.ISBN);
-        printf("%s & ", book.autor);
-        printf("%s\n", book.titulo);
+        
         livros[i] = book;
+
     }
 
     fscanf(INPUT, "%d\n", &file.consultas);
-    printf("%d\n", file.consultas);
+    printf("%d CONSULTAS\n", file.consultas);
 
     for(int32_t i = 0; i < file.consultas; i++){
+
         fscanf(INPUT, "%ld\n", &consulta);
-        printf("%ld\n", consulta);
-        retorno = buscabin(livros, 0, file.livros - 1, consulta);
-        retorno = buscainter(livros, 0, file.livros - 1, consulta);
-        imprimir(livros, retorno, bin, inter, consulta, OUTPUT);
+        
+        result = buscabin(livros, 0, file.livros - 1, consulta);
+        result = buscainter(livros, 0, file.livros - 1, consulta);
+        
+        imprimir(livros, result, bin, inter, consulta, OUTPUT);
+        
         binall += bin;
         interall += inter;
+
         if(bin < inter){
             binwin++;
         }
+
         else{
             interwin++;
         }
+
         bin = 0;
         inter = 0;
-        retorno = 0;
+        result = 0;
+
     }
 
     fprintf(OUTPUT, "BINARY=%d:%d\n", binwin, binall / file.consultas);

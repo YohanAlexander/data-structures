@@ -2,19 +2,12 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
-#define MAX 101
+#define MAX 51
 
 typedef struct fila fila;
 typedef struct pilha pilha;
 typedef struct documento documento;
 typedef struct impressora impressora;
-
-int32_t soma = 0, menor = 0, printers = 0, files = 0, paginas = 0;
-char printername[MAX], filename[MAX];
-
-impressora* impressoras;
-fila* documentos;
-pilha* entrega;
 
 struct documento{
     char nome[MAX];
@@ -39,48 +32,31 @@ struct impressora{
 
 fila* iniciarfila(int32_t size){
 
-    fila* fila;
+    fila* fila = malloc(sizeof(fila));
 
-    fila = malloc(sizeof(fila));
-
-    if(fila == NULL){
-        return NULL;
-    }
-
-    else{
-        fila->capacidade = size;
-        fila->head = 0;
-        fila->tail = 0;
-        fila->tamanho = 0;
-        fila->doc = malloc(size*sizeof(documento));
-        return fila;
-    }
+    fila->capacidade = size;
+    fila->head = 0;
+    fila->tail = 0;
+    fila->tamanho = 0;
+    fila->doc = malloc(size*sizeof(documento));
+    return fila;
 
 };
 
 pilha* iniciarpilha(int32_t size){
 
-    pilha* pilha;
+    pilha* pilha = malloc(sizeof(pilha));
 
-    pilha = malloc(sizeof(pilha));
-
-    if(pilha == NULL){
-        return NULL;
-    }
-
-    else{
-        pilha->capacidade = size;
-        pilha->topo = -1;
-        pilha->doc = malloc(size*sizeof(documento));
-        return pilha;
-    }
+    pilha->capacidade = size;
+    pilha->topo = -1;
+    pilha->doc = malloc(size*sizeof(documento));
+    return pilha;
 
 };
 
 void enfileirar(fila* fila, documento* doc){
 
-    strcpy(fila->doc[((fila->head + fila->tail) % fila->capacidade)].nome, doc->nome);
-    fila->doc[((fila->head + fila->tail) % fila->capacidade)].paginas = doc->paginas;
+    fila->doc[((fila->head + fila->tail) % fila->capacidade)] = *doc;
     fila->tail = ((fila->tail + 1) % fila->capacidade);
     fila->tamanho++;
 
@@ -88,8 +64,6 @@ void enfileirar(fila* fila, documento* doc){
 
 void desenfilerirar(fila* fila){
 
-    strcpy(fila->doc[fila->head].nome, "");
-    fila->doc[fila->head].paginas = 0;
     fila->head = ((fila->head + 1) % fila->capacidade);
     fila->tamanho--;
 
@@ -98,15 +72,12 @@ void desenfilerirar(fila* fila){
 void empilhar(pilha* pilha, documento* doc){
 
     pilha->topo++;
-    strcpy(pilha->doc[pilha->topo].nome, doc->nome);
-    pilha->doc[pilha->topo].paginas = doc->paginas;
+    pilha->doc[pilha->topo] = *doc;
 
 };
 
 void desempilhar(pilha* pilha){
 
-    strcpy(pilha->doc[pilha->topo].nome, "");
-    pilha->doc[pilha->topo].paginas = 0;
     pilha->topo--;
     pilha->capacidade--;
 
@@ -146,6 +117,13 @@ int main(int argc, char** argv){
     
     FILE* INPUT = fopen(argv[1], "r");
     FILE* OUTPUT = fopen(argv[2], "w");
+
+    int32_t soma = 0, menor = 0, printers = 0, files = 0, paginas = 0;
+    char printername[MAX], filename[MAX];
+
+    impressora* impressoras;
+    fila* documentos;
+    pilha* entrega;
  
     fscanf(INPUT, "%d\n", &printers);
     printf("%d Impressoras\n", printers);
@@ -163,7 +141,9 @@ int main(int argc, char** argv){
     fscanf(INPUT, "%d\n", &files);
     printf("%d Documentos\n", files);
 
-    for(int i = 0; i < files; i++){impressoras[i].stack = iniciarpilha(files);}
+    for(int i = 0; i < files; i++){
+        impressoras[i].stack = iniciarpilha(files);
+    }
 
     documentos = iniciarfila(files);
  
