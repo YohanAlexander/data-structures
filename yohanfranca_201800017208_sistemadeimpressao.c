@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
-#define MAX 51
+#define MAX 101
 
 typedef struct fila fila;
 typedef struct pilha pilha;
@@ -132,7 +132,6 @@ int main(int argc, char** argv){
 
     for(int i = 0; i < printers; i++){
         fscanf(INPUT, "%s\n", printername);
-        printf("%s\n", printername);
         impressora printer;
         strcpy(printer.nome, printername);
         impressoras[i] = printer;
@@ -141,7 +140,7 @@ int main(int argc, char** argv){
     fscanf(INPUT, "%d\n", &files);
     printf("%d Documentos\n", files);
 
-    for(int i = 0; i < files; i++){
+    for(int i = 0; i < printers; i++){
         impressoras[i].stack = iniciarpilha(files);
     }
 
@@ -149,7 +148,6 @@ int main(int argc, char** argv){
  
     for(int i = 0; i < files; i++){
         fscanf(INPUT, "%s %d\n", filename, &paginas);
-        printf("%s-%dp\n", filename, paginas);
         documento doc;
         strcpy(doc.nome, filename);
         doc.paginas = paginas;
@@ -168,9 +166,11 @@ int main(int argc, char** argv){
         for(int32_t i = 0; i < printers; i++){
 
             if(documentos->tamanho == documentos->capacidade){
+
                 for(int32_t i = 0; i < printers; i++){
                     imprimir(&impressoras[i], documentos, OUTPUT);
                 }
+
             }
 
             if(impressoras[i].printing < menor && impressoras[i].printing > 0){
