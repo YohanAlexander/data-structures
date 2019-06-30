@@ -85,20 +85,19 @@ void desempilhar(pilha* pilha){
 
 void printimpressora(impressora* printer, FILE* OUTPUT){
 
-    fprintf(OUTPUT, "[%s] ", (char*)printer->nome);
+    fprintf(OUTPUT, "[%s] ", printer->nome);
 
     for(int32_t i = printer->stack->topo; i > 0; i--){
-        fprintf(OUTPUT, "%s-%dp, ", (char*)printer->stack->doc[i].nome, printer->stack->doc[i].paginas);
+        fprintf(OUTPUT, "%s-%dp, ", printer->stack->doc[i].nome, printer->stack->doc[i].paginas);
     }
-
-    fprintf(OUTPUT, "%s-%dp\n", (char*)printer->stack->doc[0].nome, printer->stack->doc[0].paginas);
+    fprintf(OUTPUT, "%s-%dp\n", printer->stack->doc[0].nome, printer->stack->doc[0].paginas);
 
 };
 
 void printpilha(pilha* stack, FILE* OUTPUT){
 
     for(int32_t i = stack->capacidade; i > 0; i--){
-        fprintf(OUTPUT,"%s-%dp\n", (char*)stack->doc[stack->topo].nome, stack->doc[stack->topo].paginas);
+        fprintf(OUTPUT,"%s-%dp\n", stack->doc[stack->topo].nome, stack->doc[stack->topo].paginas);
         desempilhar(stack);
     }
 
