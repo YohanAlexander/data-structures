@@ -2,7 +2,7 @@
 #include<stdint.h>
 #include<stdlib.h>
 #include<string.h>
-#define MAX 31
+#define MAX 33
 
 typedef struct arquivo arquivo;
 typedef struct node node;
@@ -214,7 +214,7 @@ int main(int argc, char** argv){
     FILE* INPUT = fopen(argv[1], "r");
 	FILE* OUTPUT = fopen(argv[2], "w");
 
-    arvore* tree = malloc(sizeof(node*));
+    arvore* tree = malloc(sizeof(arvore));
     
     fscanf(INPUT, "%d\n", &entrada.palavras);
 
