@@ -156,7 +156,7 @@ int32_t inserir(arvore* root, arquivo* file){
     
     if(strcmp(atual->key.palavra, entrada.palavra) < 0){
         if((out = inserir(&(atual->left), file)) == 1){
-            if(balanceamento(atual) >= 2){
+            if(balanceamento(atual) == 2){
                 if(balanceamento(atual->left) == 1){
                     rotacao_right(root);
                 }
@@ -171,8 +171,8 @@ int32_t inserir(arvore* root, arquivo* file){
         
         if(strcmp(atual->key.palavra, entrada.palavra) > 0){
             if((out = inserir(&(atual->right), file)) == 1){
-                if(balanceamento(atual) >= 2){
-                    if(balanceamento(atual->right) == 1){
+                if(balanceamento(atual) == -2){
+                    if(balanceamento(atual->right) == -1){
                         rotacao_left(root);
                     }else{
                         rotacao_right_left(root);
@@ -234,7 +234,7 @@ int main(int argc, char** argv){
 
     }
 
-    ordem(tree, OUTPUT);
+    //ordem(tree, OUTPUT);
 
     node* no = malloc(sizeof(node));
     
